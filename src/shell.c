@@ -9,6 +9,7 @@
 #include "task.h"
 #include "host.h"
 
+
 typedef struct {
 	const char *name;
 	cmdfunc *fptr;
@@ -160,11 +161,42 @@ void help_command(int n,char *argv[]){
 	}
 }
 
+int stoi(char *arg){
+    int leng = strlen(arg) ;
+    int i ;
+    int sTi = 0 ;
+    for( i=0 ; i<leng; ++i){
+	sTi = sTi*10+(arg[i]-'0') ;
+    }
+    return sTi ;
+}
+
+int fibonacci(int n){
+  int previous = -1 ;
+  int result = 1 ;
+  int sum = 0 ;
+  int i ;
+  for (i=0; i<n; i++){
+      sum = previous + result ;
+      previous = result ;
+      result = sum ;
+  }
+  return result ;
+}
+
 void test_command(int n, char *argv[]) {
     int handle;
     int error;
 
     fio_printf(1, "\r\n");
+    
+    if (n>=3) {
+	if (*argv[1]=='f') {
+ 	   int fn = stoi(argv[2]) ;
+           int fr = fibonacci(fn) ;
+           fio_printf(1,"The %d fabonacci number is %d\r\n",fn,fr) ; 
+        }
+    }
     
     handle = host_action(SYS_SYSTEM, "mkdir -p output");
     handle = host_action(SYS_SYSTEM, "touch output/syslog");
