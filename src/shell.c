@@ -25,6 +25,7 @@ void help_command(int, char **);
 void host_command(int, char **);
 void mmtest_command(int, char **);
 void test_command(int, char **);
+void new_command(int, char **);
 void _command(int, char **);
 
 #define MKCL(n, d) {.name=#n, .fptr=n ## _command, .desc=d}
@@ -38,6 +39,7 @@ cmdlist cl[]={
 	MKCL(mmtest, "heap memory allocation test"),
 	MKCL(help, "help"),
 	MKCL(test, "test new function"),
+        MKCL(new, "new a task"),
 	MKCL(, ""),
 };
 
@@ -194,7 +196,10 @@ void test_command(int n, char *argv[]) {
 	if (*argv[1]=='f') {
  	   int fn = stoi(argv[2]) ;
            int fr = fibonacci(fn) ;
-           fio_printf(1,"The %d fabonacci number is %d\r\n",fn,fr) ; 
+           if (fr<0)
+              fio_printf(1,"The %d fabonacci number is overflow\r\n",fn) ;
+	   else
+              fio_printf(1,"The %d fabonacci number is %d\r\n",fn,fr) ; 
         }
     }
     
@@ -216,6 +221,24 @@ void test_command(int n, char *argv[]) {
     }
 
     host_action(SYS_CLOSE, handle);
+}
+
+void null_prompt(){
+    for(;;){
+    }
+}
+
+void new_command(int n, char *argv[]){
+    int i ;
+    fio_printf(1,"\r\n") ;    
+    if (n>=2){
+  	int tn = stoi(argv[1]) ;
+        fio_printf(1,"%d\r\n",tn) ;
+        for(i=0; i<tn; i++){
+	   xTaskCreate(null_prompt, (signed portCHAR *) "ZERO", 512, NULL, tskIDLE_PRIORITY + 2, NULL) ;
+	   /*vTaskStartScheduler();*/
+	}
+    }
 }
 
 void _command(int n, char *argv[]){
